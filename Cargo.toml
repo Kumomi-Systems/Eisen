@@ -1,0 +1,18 @@
+[package]
+name = "eisen"
+description = "A modern, 64-bit operating system written in Rust."
+version = "0.0.1"
+authors = [
+	"Johann Scott <johann@somecollagist.com>"
+]
+edition = "2021"
+readme = "README.md"
+license = "GPL-3.0"
+license-file = "LICENSE.txt"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+
+[workspace]
+members = ["bootloader", "kernel"]
