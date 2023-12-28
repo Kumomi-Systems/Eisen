@@ -2,37 +2,32 @@ OS := Eisen
 
 ROOT := $(shell dirname $(realpath $(firstword $(MAKEFILE_LIST))))
 BOOT-BIN := $(ROOT)/target-bootloader/x86_64-unknown-uefi/debug
-KERNEL-BIN := $(ROOT)/target-kernel
+KERNEL-BIN := $(ROOT)/target-kernel/kernel-target/debug
 
 IMG := $(OS).img
 
+.ONESHELL:
+SHELL = /bin/bash
+
 all: build mkimg
 
-build: build-boot
+build: build-boot build-kernel
 
-.ONESHELL:
-SHELL = /bin/bash
 build-boot:
-	cd $(ROOT)
-	cd bootloader
+	cd $(ROOT)/bootloader
 	cargo build
 
-.ONESHELL:
-SHELL = /bin/bash
 build-kernel:
-	cd $(ROOT)
-	cd kernel
+	cd $(ROOT)/kernel
 	cargo build
 
-.ONESHELL:
-SHELL = /bin/bash
 mkimg:
 	rm -f $(IMG)
 	dd if=/dev/zero of=$(IMG) bs=1M count=64
 	
 	sudo gdisk $(IMG) < $(ROOT)/gdiskcmds
 	
-	LODEV=`losetup -f`
+	LODEV=`sudo losetup -f`
 	LOPRT=$$LODEV
 	LOPRT+=p1
 	LOMNT=$(ROOT)/$(OS)_mnt
@@ -43,6 +38,8 @@ mkimg:
 
 	sudo mkdir -p $$LOMNT/efi/boot/
 	sudo cp $(BOOT-BIN)/bootloader.efi $$LOMNT/efi/boot/bootx64.efi
+	sudo mkdir -p $$LOMNT/sys/kernel/
+	sudo cp $(KERNEL-BIN)/kernel $$LOMNT/sys/kernel/kernel
 
 	sudo umount $$LOMNT
 	sudo losetup -d $$LODEV

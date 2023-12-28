@@ -1,3 +1,6 @@
 [build]
-target = "x86_64-unknown-none"
+target = "kernel-target.json"
 target-dir = "../target-kernel"
+
+[unstable]
+build-std = ["core", "compiler_builtins"]
